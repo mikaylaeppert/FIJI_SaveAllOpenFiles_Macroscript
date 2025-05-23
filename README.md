@@ -1,87 +1,59 @@
-# FIJI_SplitChannels_MacroScript
-This ImageJ macro processes all images in a user-selected folder by opening each image splitting channels if multi-channel, and saving each channel as a separate TIFF in a new output subfolder.
+# SaveOpenFiles_asTIFF - FIJI (ImageJ) Macro
 
-This FIJI (ImageJ) macro script automates the batch processing of multi-channel images in a selected directory. It opens each image, splits the channels if needed, and saves each channel as a separate TIFF file in an organized output subfolder.
+This FIJI (ImageJ) macro script automates the process of saving all currently open image windows as individual TIFF files in a user-specified directory.
 
-📁 What It Does
+## Features
 
-Processes all image files in a user-selected directory.
-Detects and splits multi-channel images using ImageJ's Split Channels function.
-Saves each individual channel as a separate TIFF file in a new output/ subfolder.
+Automatically saves all open images in the FIJI/ImageJ window as .tiff files.
+Prompts the user to choose a destination folder.
+Maintains the original image window title as the filename.
+Closes all images after saving is complete.
 
-🛠 Requirements
+## Requirements
 
-FIJI (ImageJ distribution)
-Input files must be readable by FIJI (e.g., TIFF, LSM, etc.)
-Script must be run from within FIJI (via Plugins > Macros > Run...)
+FIJI / ImageJ must be installed.
+Script is written in the ImageJ macro language (.ijm).
 
-▶️ How to Use
+## Installation
 
 Open FIJI.
-Go to Plugins > Macros > Run...
-Select the SplitChannels_inDirectory.ijm script.
-Choose the input folder when prompted.
-The script will:
-Create an output/ folder inside the selected directory.
-Save each channel of every multi-channel image as a separate TIFF.
+Go to Plugins > Macros > Edit....
+Paste the contents of SaveOpenFiles_asTIFF.ijm into the editor.
+Save the macro in your FIJI macros folder or run it directly.
 
-📝 Notes
+## Usage
 
-The script skips subfolders — it only processes image files directly inside the selected folder.
-Already single-channel images are skipped from the splitting step but still saved.
-Output files retain the original channel titles after splitting (e.g., imgName (c1).tif, imgName (c2).tif).
+Open multiple images in FIJI.
+Run the macro.
+Select the target folder when prompted.
+The macro will:
+Loop through all open images.
+Save each image as a TIFF file in the selected directory.
+Close all open images.
 
-📂 Output Example
+## Macro Code
 
-    /your/input/folder/
-    ├── image1.tif
-    ├── image2.tif
-    └── output/
-        ├── image1 (c1).tif
-        ├── image1 (c2).tif
-        ├── image2 (c1).tif
-        └── image2 (c2).tif
+    // SaveOpenFiles_asTIFF
+    // This ImageJ macro saves all open images as TIFF files
+    // and saves to a selected directory
+    
+    dir = getDirectory("Choose a Directory");  // Prompt the user to select a folder and store the path in the     variable 'dir'
 
-📄 License
+    for (i=0; i<nImages; i++) {  // Loop through all open images (nImages is the number of currently open images)
 
-Feel free to modify or adapt this script for your needs.
+        selectImage(i + 1);  // Select the (i+1)th image (ImageJ uses 1-based indexing)
 
+        title = getTitle;  // Get the title (filename) of the currently selected image
 
-    dir = getDirectory("Select A folder");  // Prompt user to select a folder and store its path in 'dir'
+        print(title);  // Print the image title to the log window for tracking
 
-    fileList = getFileList(dir);  // Get a list of all files and folders in the selected directory
+        // ids[i] = getImageID;  // (Commented out) This would store each image’s unique ID if needed
 
-    output_dir = dir + File.separator + "output" + File.separator;  // Define output directory path as a subfolder named "output" inside 'dir'
+        saveAs("tiff", dir + title);  // Save the current image as a TIFF file in the chosen directory with its     title as the filename
+    } 
 
-    File.makeDirectory(output_dir);  // Create the output directory if it doesn't already exist
+    run("Close All");  // Close all open images after saving is complete
 
-    setBatchMode(true);  // Enable batch mode to speed up processing and suppress image display updates
+## License
 
-    for (i = 0; i < lengthOf(fileList); i++) {  // Loop through every item in the file list
-
-        current_imagePath = dir + fileList[i];  // Construct the full path to the current file
-
-        if (!File.isDirectory(current_imagePath)) {  // Check if the current item is NOT a directory (i.e., is a file)
-        
-            open(current_imagePath);  // Open the current image file
-        
-            getDimensions(width, height, channels, slices, frames);  // Get image dimensions and number of channels
-        
-            if (channels > 1) run("Split Channels");  // If image has multiple channels, split them into separate images
-        
-            ch_nbr = nImages;  // Set 'ch_nbr' to the number of currently open images (channels after split)
-        
-            for (c = 1; c <= ch_nbr; c++) {  // Loop over each channel image
-            
-                selectImage(c);  // Select the c-th channel image
-            
-                currentImage_name = getTitle();  // Get the title (filename) of the current image
-            
-                saveAs("tiff", output_dir + currentImage_name);  // Save the image as TIFF in the output directory
-            }
-        
-            run("Close All");  // Close all open images before processing the next file
-        }
-    }
-
-    setBatchMode(false);  // Disable batch mode to return to normal ImageJ behavior
+This project is open source and available under the MIT License.
