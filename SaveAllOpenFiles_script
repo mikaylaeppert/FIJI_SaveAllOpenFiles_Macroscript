@@ -1,0 +1,19 @@
+// SaveOpenFiles_asTIFF
+// This ImageJ macro saves all open images as TIFF files
+// and saves to a selected directory
+dir = getDirectory("Choose a Directory");  // Prompt the user to select a folder and store the path in the variable 'dir'
+
+for (i=0; i<nImages; i++) {  // Loop through all open images (nImages is the number of currently open images)
+
+    selectImage(i + 1);  // Select the (i+1)th image (ImageJ uses 1-based indexing)
+
+    title = getTitle;  // Get the title (filename) of the currently selected image
+
+    print(title);  // Print the image title to the log window for tracking
+
+    // ids[i] = getImageID;  // (Commented out) This would store each image’s unique ID if needed
+
+    saveAs("tiff", dir + title);  // Save the current image as a TIFF file in the chosen directory with its title as the filename
+} 
+
+run("Close All");  // Close all open images after saving is complete
